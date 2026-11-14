@@ -136,6 +136,33 @@ p { margin: 0; }
 .gallery-grid.tall img { aspect-ratio: 3 / 4; object-position: center 35%; }
 .gallery-item figcaption { margin-top: 10px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 
+/* Photo viewer */
+.gallery-item img, .centre-photo { cursor: zoom-in; }
+.viewer {
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 100;
+  display: none; overflow: auto; padding: 16px;
+  background: rgba(0, 0, 0, 0.94); -webkit-overflow-scrolling: touch;
+}
+.viewer.open { display: flex; }
+.viewer img {
+  display: block; margin: auto; cursor: zoom-in;
+  max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px);
+  width: auto; height: auto;
+}
+.viewer.actual img { max-width: none; max-height: none; cursor: zoom-out; }
+.viewer-close {
+  position: fixed; top: 12px; right: 12px; z-index: 101;
+  width: 48px; height: 48px; padding: 0; cursor: pointer;
+  font: inherit; font-size: 28px; line-height: 1;
+  color: #FFFFFF; background: rgba(0, 0, 0, 0.6); border: 1px solid #FFFFFF;
+}
+.viewer-close:hover { background: #FFFFFF; color: var(--ink); }
+.viewer-caption {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 101; padding: 10px 16px;
+  text-align: center; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #FFFFFF; background: rgba(0, 0, 0, 0.6); pointer-events: none;
+}
+
 /* About */
 .about { display: flex; flex-wrap: wrap; gap: 48px 72px; padding-top: 24px; padding-bottom: 88px; }
 .about h2 { flex: 1 1 420px; min-width: 0; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.25; }
@@ -490,6 +517,66 @@ p { margin: 0; }
   var saved = null;
   try { saved = localStorage.getItem('lang'); } catch (e) {}
   if (saved && T[saved] && saved !== 'en') setLanguage(saved);
+})();
+</script>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Photo">
+  <button class="viewer-close" id="viewer-close" type="button" aria-label="Close">&times;</button>
+  <img id="viewer-img" alt="">
+  <div class="viewer-caption" id="viewer-caption"></div>
+</div>
+
+<script>
+(function () {
+  var viewer = document.getElementById('viewer');
+  var big = document.getElementById('viewer-img');
+  var caption = document.getElementById('viewer-caption');
+  var closeBtn = document.getElementById('viewer-close');
+  var opener = null;
+
+  function open(img) {
+    opener = img;
+    var fig = img.closest('figure');
+    var cap = fig && fig.querySelector('figcaption');
+    big.src = img.currentSrc || img.src;
+    big.alt = img.alt;
+    caption.textContent = cap ? cap.textContent : img.alt;
+    viewer.classList.remove('actual');
+    viewer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+
+  function close() {
+    viewer.classList.remove('open', 'actual');
+    document.body.style.overflow = '';
+    big.removeAttribute('src');
+    if (opener) opener.focus();
+  }
+
+  document.querySelectorAll('.gallery-item img, .centre-photo').forEach(function (img) {
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    img.addEventListener('click', function () { open(img); });
+    img.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(img); }
+    });
+  });
+
+  // Tap the open photo to switch between "fit the screen" and its full original size.
+  big.addEventListener('click', function (e) {
+    e.stopPropagation();
+    viewer.classList.toggle('actual');
+    if (viewer.classList.contains('actual')) {
+      viewer.scrollLeft = (viewer.scrollWidth - viewer.clientWidth) / 2;
+      viewer.scrollTop = (viewer.scrollHeight - viewer.clientHeight) / 2;
+    }
+  });
+  viewer.addEventListener('click', close);
+  closeBtn.addEventListener('click', function (e) { e.stopPropagation(); close(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && viewer.classList.contains('open')) close();
+  });
 })();
 </script>
 
