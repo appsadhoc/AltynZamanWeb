@@ -154,6 +154,23 @@ p { margin: 0; }
 .footer { border-top: 1px solid #333333; }
 .footer .wrap { padding-top: 24px; padding-bottom: 24px; font-size: 14px; color: #BDBDBD; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
 
+/* Email provider menu */
+.mail-menu { position: relative; display: inline-block; }
+.mail-menu summary { list-style: none; cursor: pointer; }
+.mail-menu summary::-webkit-details-marker { display: none; }
+.mail-options {
+  position: absolute; left: 0; top: 100%; margin-top: 8px; z-index: 10;
+  min-width: 260px; display: flex; flex-direction: column;
+  background: #FFFFFF; color: var(--ink); border: 1px solid var(--ink);
+}
+.mail-options a, .mail-options button {
+  font: inherit; font-size: 15px; text-align: left; text-decoration: none;
+  padding: 12px 18px; background: none; color: inherit; cursor: pointer;
+  border: 0; border-bottom: 1px solid var(--line);
+}
+.mail-options > :last-child { border-bottom: 0; }
+.mail-options a:hover, .mail-options button:hover { background: var(--panel); }
+
 @media (max-width: 900px) {
   .gallery-grid.tall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
@@ -370,7 +387,20 @@ p { margin: 0; }
     <div class="contact-intro">
       <h2 data-i18n="nav_write">Write to us</h2>
       <p data-i18n="write_text">For questions about collections, availability, or partnership, send us an email and our office will reply.</p>
-      <div><a class="btn btn-mail" href="mailto:office@altynzaman-im.com" data-i18n="btn_mail">Send an email</a></div>
+      <div>
+        <details class="mail-menu">
+          <summary class="btn btn-mail" data-i18n="btn_mail">Send an email</summary>
+          <div class="mail-options">
+            <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=office@altynzaman-im.com" target="_blank" rel="noopener">Gmail</a>
+            <a href="https://outlook.live.com/mail/0/deeplink/compose?to=office@altynzaman-im.com" target="_blank" rel="noopener">Outlook</a>
+            <a href="https://compose.mail.yahoo.com/?to=office@altynzaman-im.com" target="_blank" rel="noopener">Yahoo Mail</a>
+            <a href="https://e.mail.ru/compose/?to=office@altynzaman-im.com" target="_blank" rel="noopener">Mail.ru</a>
+            <a href="https://mail.yandex.com/compose?to=office@altynzaman-im.com" target="_blank" rel="noopener">Yandex Mail</a>
+            <a href="mailto:office@altynzaman-im.com" data-i18n="mail_app">Mail app on this device</a>
+            <button type="button" id="copy-mail" data-i18n="mail_copy">Copy address</button>
+          </div>
+        </details>
+      </div>
     </div>
     <div class="contact-list">
       <a href="mailto:office@altynzaman-im.com">office@altynzaman-im.com</a>
@@ -421,6 +451,8 @@ p { margin: 0; }
       about_text: 'Resmi diler hökmünde kompaniýa Aşgabatda 16 halkara lýuks we moda brendine wekilçilik edýär. Butikler «Altyn Zaman» we «Arkaç» söwda we işewürlik merkezlerinde ýerleşýär.',
       write_text: 'Kolleksiýalar, harytlaryň barlygy ýa-da hyzmatdaşlyk barada soraglaryňyz bar bolsa, bize elektron hat ýazyň — ofisimiz size jogap berer.',
       btn_mail: 'Hat ibermek',
+      mail_app: 'Şu enjamdaky poçta programmasy',
+      mail_copy: 'Salgyny göçürmek',
       office_address: '«Altyn Zaman» söwda we hyzmat ediş merkezi<br>2022 (A. Nowaýy) köçesi, 100, Köpetdag etraby<br>Aşgabat, Türkmenistan',
       rights: 'Ähli brend atlary öz eýelerine degişlidir.'
     },
@@ -456,6 +488,8 @@ p { margin: 0; }
       about_text: 'Как официальный дилер компания представляет в Ашхабаде 16 международных люксовых и модных брендов. Бутики расположены в торгово-деловых центрах «Altyn Zaman» и «Arkach».',
       write_text: 'По вопросам о коллекциях, наличии товаров или сотрудничестве напишите нам на электронную почту — наш офис вам ответит.',
       btn_mail: 'Написать письмо',
+      mail_app: 'Почтовое приложение на устройстве',
+      mail_copy: 'Скопировать адрес',
       office_address: 'Торговый центр «Altyn Zaman»<br>Туркменистан, г. Ашхабад<br>Копетдагский этрап, ул. 2022 (А. Навои), 100',
       rights: 'Все названия брендов принадлежат их правообладателям.'
     }
@@ -490,6 +524,14 @@ p { margin: 0; }
   var saved = null;
   try { saved = localStorage.getItem('lang'); } catch (e) {}
   if (saved && T[saved] && saved !== 'en') setLanguage(saved);
+
+  var copyBtn = document.getElementById('copy-mail');
+  copyBtn.addEventListener('click', function () {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText('office@altynzaman-im.com').then(function () {
+      copyBtn.textContent = '\u2713 office@altynzaman-im.com';
+    });
+  });
 })();
 </script>
 
