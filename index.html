@@ -154,6 +154,21 @@ p { margin: 0; }
 .footer { border-top: 1px solid #333333; }
 .footer .wrap { padding-top: 24px; padding-bottom: 24px; font-size: 14px; color: #BDBDBD; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
 
+/* Contact form */
+.contact-form { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; max-width: 440px; position: relative; }
+.contact-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #CFCFCF; }
+.contact-form input, .contact-form textarea {
+  font: inherit; font-size: 17px; letter-spacing: normal; text-transform: none;
+  width: 100%; padding: 12px 14px; border-radius: 0;
+  color: #FFFFFF; background: transparent; border: 1px solid #6A6A6A;
+}
+.contact-form textarea { min-height: 140px; resize: vertical; }
+.contact-form input:focus, .contact-form textarea:focus { outline: 2px solid #FFFFFF; outline-offset: 1px; border-color: #FFFFFF; }
+.contact-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
+.contact-form button { font: inherit; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; align-self: flex-start; margin-top: 4px; }
+.contact-form button[disabled] { opacity: 0.6; cursor: default; }
+.form-status { min-height: 1.6em; font-size: 15px; }
+
 @media (max-width: 900px) {
   .gallery-grid.tall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
@@ -370,7 +385,17 @@ p { margin: 0; }
     <div class="contact-intro">
       <h2 data-i18n="nav_write">Write to us</h2>
       <p data-i18n="write_text">For questions about collections, availability, or partnership, send us an email and our office will reply.</p>
-      <div><a class="btn btn-mail" href="mailto:office@altynzaman-im.com" data-i18n="btn_mail">Send an email</a></div>
+      <form class="contact-form" id="contact-form">
+        <label><span data-i18n="form_email">Your email</span>
+          <input type="email" name="email" autocomplete="email" maxlength="254" required>
+        </label>
+        <label><span data-i18n="form_message">Message</span>
+          <textarea name="message" rows="5" maxlength="5000" required></textarea>
+        </label>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn btn-mail" type="submit" data-i18n="btn_send">Send message</button>
+        <p class="form-status" id="form-status" role="status"></p>
+      </form>
     </div>
     <div class="contact-list">
       <a href="mailto:office@altynzaman-im.com">office@altynzaman-im.com</a>
@@ -420,7 +445,9 @@ p { margin: 0; }
       about_title: '2019-njy ýylda esaslandyrylan «Altyn Zaman Işewürlik Merkezi» Hojalyk jemgyýeti lýuks we premium derejeli egin-eşikleriň, aýakgaplaryň, sagatlaryň we aksessuarlaryň bölek söwdasy bilen meşgullanýar.',
       about_text: 'Resmi diler hökmünde kompaniýa Aşgabatda 16 halkara lýuks we moda brendine wekilçilik edýär. Butikler «Altyn Zaman» we «Arkaç» söwda we işewürlik merkezlerinde ýerleşýär.',
       write_text: 'Kolleksiýalar, harytlaryň barlygy ýa-da hyzmatdaşlyk barada soraglaryňyz bar bolsa, bize elektron hat ýazyň — ofisimiz size jogap berer.',
-      btn_mail: 'Hat ibermek',
+      form_email: 'Siziň e-poçtaňyz',
+      form_message: 'Hatyňyz',
+      btn_send: 'Ibermek',
       office_address: '«Altyn Zaman» söwda we hyzmat ediş merkezi<br>2022 (A. Nowaýy) köçesi, 100, Köpetdag etraby<br>Aşgabat, Türkmenistan',
       rights: 'Ähli brend atlary öz eýelerine degişlidir.'
     },
@@ -455,7 +482,9 @@ p { margin: 0; }
       about_title: 'Хозяйственное общество «Алтын Заман Ишевирлик Меркези» основано в 2019 году и специализируется на розничной продаже одежды, обуви, часов и аксессуаров класса люкс и премиум.',
       about_text: 'Как официальный дилер компания представляет в Ашхабаде 16 международных люксовых и модных брендов. Бутики расположены в торгово-деловых центрах «Altyn Zaman» и «Arkach».',
       write_text: 'По вопросам о коллекциях, наличии товаров или сотрудничестве напишите нам на электронную почту — наш офис вам ответит.',
-      btn_mail: 'Написать письмо',
+      form_email: 'Ваш email',
+      form_message: 'Сообщение',
+      btn_send: 'Отправить',
       office_address: 'Торговый центр «Altyn Zaman»<br>Туркменистан, г. Ашхабад<br>Копетдагский этрап, ул. 2022 (А. Навои), 100',
       rights: 'Все названия брендов принадлежат их правообладателям.'
     }
@@ -490,6 +519,50 @@ p { margin: 0; }
   var saved = null;
   try { saved = localStorage.getItem('lang'); } catch (e) {}
   if (saved && T[saved] && saved !== 'en') setLanguage(saved);
+
+  var MSG = {
+    en: {
+      sending: 'Sending…',
+      ok: 'Thank you. Your message has been sent.',
+      fail: 'The message could not be sent. Please write to office@altynzaman-im.com.'
+    },
+    tk: {
+      sending: 'Iberilýär…',
+      ok: 'Sag boluň. Hatyňyz iberildi.',
+      fail: 'Haty iberip bolmady. office@altynzaman-im.com salgysyna ýazmagyňyzy haýyş edýäris.'
+    },
+    ru: {
+      sending: 'Отправка…',
+      ok: 'Спасибо. Ваше сообщение отправлено.',
+      fail: 'Не удалось отправить сообщение. Пожалуйста, напишите на office@altynzaman-im.com.'
+    }
+  };
+  var form = document.getElementById('contact-form');
+  var statusEl = document.getElementById('form-status');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var m = MSG[document.documentElement.lang] || MSG.en;
+    var btn = form.querySelector('button');
+    btn.disabled = true;
+    statusEl.textContent = m.sending;
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: form.elements.email.value,
+        message: form.elements.message.value,
+        website: form.elements.website.value
+      })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('send failed');
+      form.reset();
+      statusEl.textContent = m.ok;
+    }).catch(function () {
+      statusEl.textContent = m.fail;
+    }).then(function () {
+      btn.disabled = false;
+    });
+  });
 })();
 </script>
 
